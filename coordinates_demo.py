@@ -2,41 +2,64 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-# Määritellään etäisyys ja kulmat
-distances = [16, 20, 25]  # Etäisyydet metreissä (voit lisätä tai muuttaa)
-angles_azimuth = [30, 45, 60]  # Azimuti-kulmat asteina
-angles_elevation = [0, 10, 20]  # Elevation-kulmat asteina
+# Määritellään vakioita
 
-# Muutetaan kulmat radiaaneiksi laskelmia varten
-angles_azimuth_rad = np.radians(angles_azimuth)
-angles_elevation_rad = np.radians(angles_elevation)
+c = 299792458   # Valon nopeus m/s
+R = 70          # Etäisyys kohteeseen m
+d = 0.002       # antennien välinen etäisyys m (2mm)
 
-# Tyhjät listat x, y ja z koordinaateille
-x_coords = []
-y_coords = []
-z_coords = []
+IF1 = 77.1e9      # RX1 IF taajuus Hz
+IF2 = 77.2e9      # RX2 IF taajuus Hz
+IF3 = 77.3e9        # RX3 IF taajuus Hz
+IF4 = 77.4e9        # RX4 IF taajuus Hz
 
-# Lasketaan kullekin etäisyydelle ja kulmalle koordinaatit
-for R, theta, phi in zip(distances, angles_azimuth_rad, angles_elevation_rad):
-    x = R * np.cos(phi) * np.sin(theta)
-    y = R * np.cos(phi) * np.cos(theta)
-    z = R * np.sin(phi)
-    
-    x_coords.append(x)
-    y_coords.append(y)
-    z_coords.append(z)
+
+al1 = c / (IF1)
+al2 = c / (IF2)
+al3 = c / (IF3)
+al4 = c / (IF4)
+
+# lasketaan vaihe-ero
+ve = 2 * np.pi * d / al1
+ve2 = 2 * np.pi * d / al2
+ve3 = 2 * np.pi * d / al3
+ve4 = 2 * np.pi * d / al4
+
+# print aallonpituudet
+print(al1, al2, al3, al4)
+
+# laske vaihe-erot
+print(ve, ve2, ve3, ve4)
+
+
+kulma = np.sin(0.0039 * np.pi) / (2 * np.pi * 0.004)
+print(kulma)
+
+kulma2 = np.arcsin(kulma)
+print(kulma2)
+
+# lasketaan koordinaatit
+
+x = R * np.cos(kulma2) * np.sin(0.0039)
+y = R * np.cos(kulma2) * np.cos(0.0039)
+z = R * np.sin(kulma2)
+
+print(x, y, z)
 
 # Piirretään 3D-pistepilvi
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 # Piirretään pisteet
-ax.scatter(x_coords, y_coords, z_coords, c='b', marker='o', s=50, label='Kohteet')
+ax.scatter(x, y, z, c='b', marker='o', s=50, label='Kohteet')
 
 # Asetetaan akselien nimet
 ax.set_xlabel('X (m)')
 ax.set_ylabel('Y (m)')
 ax.set_zlabel('Z (m)')
+ax.set_xlim([-100, 100])
+ax.set_ylim([-100, 100])
+ax.set_zlim([-100, 100])
 
 # Asetetaan otsikko ja legendat
 ax.set_title('3D-pistepilvi kohteiden sijainnista')
@@ -44,3 +67,4 @@ ax.legend()
 
 # Näytetään kuvaaja
 plt.show()
+
